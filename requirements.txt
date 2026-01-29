@@ -2,3 +2,5 @@ google-adk>=0.1.0
 ddgs
 google-cloud-aiplatform
 python-dotenv
+mcp
+httpx
