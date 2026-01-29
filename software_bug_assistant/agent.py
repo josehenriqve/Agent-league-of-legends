@@ -41,20 +41,15 @@ def search_tool(query: str) -> str:
     except Exception as e:
         return f"Error performing search: {str(e)}"
 
-# --- MCP Setup ---
 
-# Path to the lol-client-mcp directory relative to the project root
-# We assume the agent is run from the project root or we find the path dynamically
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-lol_mcp_script = os.path.join(base_dir, "lol-client-mcp", "main.py")
 
-# Using StdioServerParameters as required by the new McpToolset signature
-lol_mcp_toolset = McpToolset(
-    connection_params=StdioServerParameters(
-        command=sys.executable,
-        args=[lol_mcp_script],
-    )
+# --- LOL Fandom MCP Setup ---
+lol_mcp_params = StdioServerParameters(
+    command=sys.executable,
+    args=["-m", "lol_fandom_mcp.server"],
+    env=None
 )
+lol_mcp_toolset = McpToolset(connection_params=lol_mcp_params)
 
 # --- Agent ---
 
@@ -63,11 +58,10 @@ root_agent = Agent(
     name="lol_helper_agent",
     instruction="""
     You are a helpful assistant for League of Legends players.
-    You have access to real-time game data via the 'lol-client-mcp' tools.
-    Use these tools to answer questions about the current game, player stats, items, etc.
-    If the tool returns a connection error, inform the user that the game client might not be running or the game hasn't started.
+    You have access to the League of Legends Fandom Wiki via the 'lol_fandom_mcp' tools.
+    Use these tools to search for champions, items, lore, and other game information directly from the wiki.
     
-    You also have general search capabilities and a date tool.
+    You also have access to real-time game data via the 'lol-clie
     """,
-    tools=[get_current_date, search_tool, lol_mcp_toolset],
+    tools=[lol_mcp_toolset],
 )
