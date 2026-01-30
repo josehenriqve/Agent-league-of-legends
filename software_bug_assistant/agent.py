@@ -15,21 +15,16 @@ except ImportError:
 
 # --- Tools ---
 
-def get_current_date() -> dict:
-    """
-    Get the current date in the format YYYY-MM-DD
-    """
-    return {"current_date": datetime.now().strftime("%Y-%m-%d")}
-
 def search_tool(query: str) -> str:
     """
-    Performs a web search using DuckDuckGo.
+    Performs a web search using DuckDuckGo. 
+    Use this ONLY to verify the correct spelling of a player's nickname.
     
     Args:
-        query: The search query string.
+        query: The search query string (e.g., "League of Legends player [name]").
     """
     try:
-        results = DDGS().text(query, max_results=3)
+        results = DDGS().text(query, max_results=2) # Reduced results as we just need the name
         if not results:
             return "No results found."
         
@@ -43,8 +38,6 @@ def search_tool(query: str) -> str:
 # --- MCP Setup ---
 
 # Path to the lol-client-mcp directory relative to the project root
-# We calculate path based on this agent.py file location (projeto/software_bug_assistant/agent.py)
-# So we go up two levels to get to 'projeto' where 'lol-client-mcp' is located.
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 lol_mcp_script = os.path.join(base_dir, "lol_fandom_mcp", "server.py")
 
@@ -65,12 +58,17 @@ root_agent = Agent(
     model="gemini-2.5-flash",
     name="lol_helper_agent",
     instruction="""
-    You are a helpful assistant for League of Legends players.
-    You have access to real-time game data via the 'lol-client-mcp' tools.
-    Use these tools to answer questions about the current game, player stats, items, etc.
-    If the tool returns a connection error, inform the user that the game client might not be running or the game hasn't started.
+    You are the 'League of Legends Helper' (Agent 1).
+    Your ONLY purpose is to accurately retrieve player statistics for the Data Collector.
     
-    You also have general search capabilities and a date tool.
+    STRICT WORKFLOW:
+    1. **Identify Nickname**: The user will ask about a player (e.g., "titaN"). Use the `search_tool` to confirm the player's correct nickname and casing (e.g. search for "League of Legends player titaN").
+    2. **Fetch Stats**: Once you have the confirmed nickname, use the `lol_client_toolset` (specifically `get_player_stats`) to get their stats.
+       - Use the 'start_date' and 'end_date' provided by the user if available.
+       - If no date is provided, use the tool's defaults.
+    
+    Do NOT answer general questions. Focus purely on this retrieval pipeline.
+    Output the data clearly so the calling agent can parse it.
     """,
-    tools=[get_current_date, search_tool, lol_client_toolset],
+    tools=[search_tool, lol_client_toolset],
 )
