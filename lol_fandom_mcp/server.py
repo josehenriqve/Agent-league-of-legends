@@ -1,6 +1,10 @@
 import asyncio
-from .client import LolFandomClient
-from .simple_mcp import SimpleMCP
+try:
+    from .client import LolFandomClient
+    from .simple_mcp import SimpleMCP
+except ImportError:
+    from client import LolFandomClient
+    from simple_mcp import SimpleMCP
 import json
 
 # Initialize SimpleMCP server

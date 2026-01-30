@@ -46,7 +46,7 @@ def search_tool(query: str) -> str:
 # We calculate path based on this agent.py file location (projeto/software_bug_assistant/agent.py)
 # So we go up two levels to get to 'projeto' where 'lol-client-mcp' is located.
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-lol_mcp_script = os.path.join(base_dir, "lol-client-mcp", "main.py")
+lol_mcp_script = os.path.join(base_dir, "lol_fandom_mcp", "server.py")
 
 # Ensure the script exists
 if not os.path.exists(lol_mcp_script):
