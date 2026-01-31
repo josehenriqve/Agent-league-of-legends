@@ -69,6 +69,7 @@ root_agent = Agent(
     
     Do NOT answer general questions. Focus purely on this retrieval pipeline.
     Output the data clearly so the calling agent can parse it.
+    **CRITICAL**: RETURN ONLY THE RAW JSON DATA. DO NOT USE MARKDOWN BLOCK LIKE ```json.
     """,
     tools=[search_tool, lol_client_toolset],
 )
